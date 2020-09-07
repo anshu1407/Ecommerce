@@ -20,10 +20,32 @@
 <body>
 
 <%@include file="components/navbar.jsp" %>
+
+<div class="container-fluid">
 <div class="row mt-3 mx-3">
 <%
+
+ String cat= request.getParameter("category");
+/* out.println(cat); */
   ProductDao dao=new ProductDao(FactoryProvider.getFactory());
-  List<Product> list= dao.getAllProducts();
+  List<Product> list=null;
+  
+  if(cat==null){
+	  list= dao.getAllProducts();  
+  } 
+  else if(cat.trim().equals("all"))
+  {
+
+	 list= dao.getAllProducts();
+  }
+  else {
+	  
+	  int cid =Integer.parseInt(cat.trim());
+	  list =dao.getAllProductsById(cid);
+  }
+
+
+
   
   CategoryDao cdao= new CategoryDao(FactoryProvider.getFactory());
   List<Category> clist= cdao.getCategories();
@@ -31,7 +53,7 @@
 <!-- show categories -->
 <div class="col-md-2">
 <div class="list-group">
- <a href="#" class="list-group-item list-group-item-action active custom-bg">
+ <a href="index.jsp?category=all" class="list-group-item list-group-item-action active custom-bg">
    All Products
   </a>
   
@@ -39,7 +61,7 @@
 
  for(Category category : clist){
 	%>
- <a href="#" class="list-group-item list-group-item-action"><%=category.getCategoryTitle() %></a>
+ <a href="index.jsp?category=<%=category.getCategoryId() %>" class="list-group-item list-group-item-action"><%=category.getCategoryTitle() %></a>
 	 <%
  }
 %>
@@ -59,7 +81,9 @@
 %>
 <div class="card">
 
-<img class="card-img-top m-2" src="img/products/<%=product.getpPhoto() %>" style="max-height: 270px" alt="img loading">
+<div class="container text-center">
+<img class="card-img-top m-2" src="img/products/<%=product.getpPhoto() %>" style="max-height: 200px; max-width: 100%; width: auto;" alt="img loading">
+</div>
 <div class="card-body">
 
 <h5 class="card-tittle"><%=product.getpTitle()%></h5>
@@ -77,6 +101,10 @@
 <%
 }
 
+if(list.size()== 0){
+	out.println(" <h3>Sorry, No items are available</h3>");
+}
+
 %>
 
 
@@ -90,6 +118,6 @@
 
 
 </div>
-
+</div>
 </body>
 </html>
